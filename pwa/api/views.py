@@ -181,3 +181,49 @@ class CustomerTask(generics.ListCreateAPIView):
 			return returnResponse( request, 'Customer not found' , False , 200 )
 
 		return returnResponse( request, 'Server error' , False , 500 )
+
+class CustomerTaskEdit(APIView):
+	def post(self,request):
+		try:
+			token = jwt.decode(request.headers['x-auth-token'], 'secret', algorithms=['HS256'])
+		except Exception as e:
+			return returnResponse( request, str(e) , False , 500)
+
+		customer = Customer.objects.filter(phone=token['phone']).first()
+
+		if customer:
+			request_data = request.data
+			if 'guid' in request_data:
+				task = Task.objects.filter(customer_id = customer.id, guid = request_data['guid']).first()
+				try:
+					if 'title' in request_data:
+						task.title = request_data['title']
+					if 'body' in request_data:
+						task.body = request_data['body']
+					if 'color' in request_data:
+						task.color = request_data['color']
+					if 'pinned' in request_data:
+						task.pinned = request_data['pinned']
+
+					task.updated = timezone.now()
+
+					task.save()
+
+					response = {
+						'title': task.title,
+						'body': task.body,
+						'color': task.color,
+						'pinned': task.pinned,
+						'guid': task.guid,
+						'updated': task.updated,
+					}
+
+					return returnResponse( request, response , True , 200 )
+				except Exception as e:
+					return returnResponse( request, str(e) , False , 500)
+			else:
+				return returnResponse( request, 'Invalid request' , False , 404 )
+		else:
+			return returnResponse( request, 'Customer not found' , False , 404 )
+
+		return returnResponse( request, 'Server error' , False , 500 )

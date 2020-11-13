@@ -1,11 +1,10 @@
 from rest_framework import serializers
-from .models import Status, Customer, CustomerCode
+from .models import Status, Customer, CustomerCode, Task
 
 class StatusSerializer(serializers.ModelSerializer):
 	class Meta:
 		model = Status
 		fields = ('name', 'key')
-
 
 class CustomerSerializer(serializers.ModelSerializer):
 	def validate(self, data):
@@ -21,3 +20,8 @@ class CustomerCodeSerializer(serializers.ModelSerializer):
 	class Meta:
 		model = CustomerCode
 		fields = ('customer', 'code')
+
+class TaskSerializer(serializers.ModelSerializer):
+	class Meta:
+		model = Task
+		fields = ('customer', 'status', 'title', 'body', 'color', 'pinned', 'created', 'updated')

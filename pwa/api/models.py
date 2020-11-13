@@ -21,3 +21,20 @@ class Customer(models.Model):
 class CustomerCode(models.Model):
 	customer = models.ForeignKey(Customer, on_delete=models.PROTECT)
 	code = models.CharField(max_length=6)
+
+class TaskStatus(models.Model):
+	name = models.CharField(max_length=100)
+	key = models.CharField(max_length=100)
+
+	def __str__(self):
+		return self.name
+
+class Task(models.Model):
+	customer = models.ForeignKey(Customer, on_delete=models.PROTECT)
+	status = models.ForeignKey(TaskStatus, on_delete=models.PROTECT)
+	title = models.CharField(max_length=100, null=True)
+	body = models.CharField(max_length=300)
+	color = models.CharField(max_length=100)
+	pinned = models.BooleanField()
+	created = models.DateTimeField(auto_now_add=True)
+	updated = models.DateTimeField(auto_now=True)

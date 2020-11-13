@@ -3,11 +3,12 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from django.conf import settings
 from django.core import serializers
+from django.utils import timezone
 
 import jwt, json, random
 
-from .serializers import CustomerSerializer, CustomerCodeSerializer
-from .models import Customer
+from .serializers import CustomerSerializer, CustomerCodeSerializer, TaskSerializer
+from .models import Customer, Task
 from .models import CustomerCode as CustomerCodeModel
 
 from twilio.rest import Client
@@ -120,5 +121,63 @@ class CustomerEdit(APIView):
 
 		else:
 			return returnResponse( request, 'Customer not found' , False , 404 )
+
+		return returnResponse( request, 'Server error' , False , 500 )
+
+
+
+
+class CustomerTask(generics.ListCreateAPIView):
+	queryset = Task.objects.all()
+	serializer_class = TaskSerializer
+
+	def list(self, request):
+		try:
+			token = jwt.decode(request.headers['x-auth-token'], 'secret', algorithms=['HS256'])
+		except Exception as e:
+			return returnResponse( request, str(e) , False , 500)
+
+		customer = Customer.objects.filter(phone=token['phone']).first()
+
+		if customer:
+			queryset = Task.objects.filter(customer_id = customer.id)
+			serializer = TaskSerializer(queryset, many=True)
+			return returnResponse( request, serializer.data , True , 200 )
+		else:
+			return returnResponse( request, 'Customer not found' , False , 404 )
+
+		return returnResponse( request, 'Server error' , False , 500 )
+
+	def create(self, request):
+		#raise Exception('create')
+		try:
+			token = jwt.decode(request.headers['x-auth-token'], 'secret', algorithms=['HS256'])
+		except Exception as e:
+			return returnResponse( request, str(e) , False , 500 )
+
+		customer = Customer.objects.filter(phone=token['phone']).first()
+		if customer:
+			if request.data:
+				data = {
+					"customer": customer.id,
+					"status": 1,
+					"title": request.data['title'],
+					"body": request.data['body'],
+					"color": request.data['color'],
+					"pinned": request.data['pinned'],
+					"created": timezone.now(),
+					"updated": timezone.now()
+				}
+				serializer = TaskSerializer(data=data)
+
+				if (serializer.is_valid()):
+					serializer.save()
+					return returnResponse( request, 'True' , True , 200 )
+				else:
+					return returnResponse( request, serializer.errors , False , 404 )
+			else:
+				return returnResponse( request, 'Post data null' , False , 400 )
+		else:
+			return returnResponse( request, 'Customer not found' , False , 200 )
 
 		return returnResponse( request, 'Server error' , False , 500 )

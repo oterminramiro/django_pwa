@@ -24,4 +24,4 @@ class CustomerCodeSerializer(serializers.ModelSerializer):
 class TaskSerializer(serializers.ModelSerializer):
 	class Meta:
 		model = Task
-		fields = ('customer', 'status', 'title', 'body', 'color', 'pinned', 'created', 'updated')
+		fields = ('customer', 'status', 'title', 'body', 'color', 'pinned', 'guid', 'created', 'updated')

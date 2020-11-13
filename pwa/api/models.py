@@ -36,5 +36,6 @@ class Task(models.Model):
 	body = models.CharField(max_length=300)
 	color = models.CharField(max_length=100)
 	pinned = models.BooleanField()
+	guid = models.UUIDField(default=uuid.uuid4, editable=False)
 	created = models.DateTimeField(auto_now_add=True)
 	updated = models.DateTimeField(auto_now=True)

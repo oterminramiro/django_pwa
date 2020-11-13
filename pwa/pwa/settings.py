@@ -24,6 +24,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = 'h*jw+=3@%b^vm3z#k_80t34+#rs!0w(+%s$5-wooc8x@wdipb+'
+SECRET_KEY = config('SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -134,3 +135,5 @@ STATICFILES_DIRS = [
 
 
 # Env vars
+TWILIO_SID = config('TWILIO_SID')
+TWILIO_TOKEN = config('TWILIO_TOKEN')

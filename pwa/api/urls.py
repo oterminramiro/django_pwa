@@ -11,4 +11,5 @@ urlpatterns = [
 
 	path("customer_task/", views.CustomerTask.as_view(), name="customer_task"),
 	path("task_edit/", views.CustomerTaskEdit.as_view(), name="task_edit"),
+	path("task_delete/", views.CustomerTaskDelete.as_view(), name="task_delete"),
 ]
